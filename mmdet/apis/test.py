@@ -31,20 +31,20 @@ def single_gpu_test(model,
             result = model(return_loss=False, rescale=True, **data)
             
         ##### save bbox & mask feature map numpy format #####
-        path_bbox = osp.join('/ws/external', 'outputs', 'cityscapes', 'bbox')
-        path_mask = osp.join('/ws/external', 'outputs', 'cityscapes', 'mask')
-
-
-        bbox = result[0][0]
-        mask = result[0][1]
-        if not(osp.exists(path_bbox)):
-            os.mkdir(path_bbox)
-        if not (osp.exists(path_mask)):
-            os.mkdir(path_mask)
-
-        name = data['img_metas'][0].data[0][0]['ori_filename'][30:36]
-        np.save(osp.join(path_bbox, 'bbox_%s' % name), np.array(bbox))
-        np.save(osp.join(path_mask, 'mask_%s' % name), np.array(mask))
+        # path_bbox = osp.join('/ws/external', 'outputs', 'cityscapes', 'bbox')
+        # path_mask = osp.join('/ws/external', 'outputs', 'cityscapes', 'mask')
+        #
+        #
+        # bbox = result[0][0]
+        # mask = result[0][1]
+        # if not(osp.exists(path_bbox)):
+        #     os.mkdir(path_bbox)
+        # if not (osp.exists(path_mask)):
+        #     os.mkdir(path_mask)
+        #
+        # name = data['img_metas'][0].data[0][0]['ori_filename'][30:36]
+        # np.save(osp.join(path_bbox, 'bbox_%s' % name), np.array(bbox))
+        # np.save(osp.join(path_mask, 'mask_%s' % name), np.array(mask))
         ##### end #####
 
         batch_size = len(result)

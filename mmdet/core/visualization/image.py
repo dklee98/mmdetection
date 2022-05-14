@@ -1,4 +1,5 @@
 # Copyright (c) OpenMMLab. All rights reserved.
+import os
 import cv2
 import matplotlib.pyplot as plt
 import mmcv
@@ -272,6 +273,22 @@ def imshow_det_bboxes(img,
         labels = labels[inds]
         if segms is not None:
             segms = segms[inds, ...]
+
+    path_bbox = os.path.join('/ws/external', 'outputs', 'cityscapes', 'bbox')
+    path_mask = os.path.join('/ws/external', 'outputs', 'cityscapes', 'mask')
+    path_label = os.path.join('/ws/external', 'outputs', 'cityscapes', 'label')
+
+    if not(os.path.exists(path_bbox)):
+        os.mkdir(path_bbox)
+    if not(os.path.exists(path_mask)):
+        os.mkdir(path_mask)
+    if not(os.path.exists(path_label)):
+        os.mkdir(path_label)
+
+    name = out_file[72:78]
+    np.save(os.path.join(path_bbox, 'bbox_%s' % name), bboxes)
+    np.save(os.path.join(path_mask, 'mask_%s' % name), segms)
+    np.save(os.path.join(path_label, 'label_%s' % name), labels)
 
     img = mmcv.bgr2rgb(img)
     width, height = img.shape[1], img.shape[0]

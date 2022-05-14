@@ -317,7 +317,7 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
                 segm_result = segm_result[0]  # ms rcnn
         else:
             bbox_result, segm_result = result, None
-        bboxes = np.vstack(bbox_result)
+        bboxes = np.vstack(bbox_result) # sum all class
         labels = [
             np.full(bbox.shape[0], i, dtype=np.int32)
             for i, bbox in enumerate(bbox_result)
