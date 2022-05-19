@@ -7,6 +7,7 @@ import numpy as np
 import pycocotools.mask as mask_util
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
+from PIL import Image
 
 from mmdet.core.evaluation.panoptic_utils import INSTANCE_OFFSET
 from ..mask.structures import bitmap_to_polygon
@@ -277,6 +278,10 @@ def imshow_det_bboxes(img,
     path_bbox = os.path.join('/ws/external', 'outputs', 'cityscapes', 'bbox')
     path_mask = os.path.join('/ws/external', 'outputs', 'cityscapes', 'mask')
     path_label = os.path.join('/ws/external', 'outputs', 'cityscapes', 'label')
+    path_test = os.path.join('/ws/data', 'cityscapes', 'gtFine', 'train', 'aachen')
+    te1 = Image.open(path_test + '/aachen_000000_000019_gtFine_instanceIds.png')
+    pixel1 = np.array(te1)
+
 
     if not(os.path.exists(path_bbox)):
         os.mkdir(path_bbox)
@@ -285,10 +290,49 @@ def imshow_det_bboxes(img,
     if not(os.path.exists(path_label)):
         os.mkdir(path_label)
 
+
     name = out_file[72:78]
     np.save(os.path.join(path_bbox, 'bbox_%s' % name), bboxes)
     np.save(os.path.join(path_mask, 'mask_%s' % name), segms)
     np.save(os.path.join(path_label, 'label_%s' % name), labels)
+
+    # print(segms.shape, labels.shape)
+    label_id_list = []
+    label_id = np.zeros((1024,2048), dtype=np.int32)
+    for i, seg in enumerate(segms):
+        temp = seg * 1
+        seg_idx = np.where(temp == 1)
+        id_ = 0
+        if labels[i] == 0: id_ = 24001 # person
+        elif labels[i] == 1: id_ = 25001 # rider
+        elif labels[i] == 2: id_ = 26001 # car
+        elif labels[i] == 3: id_ = 27001 # truck
+        elif labels[i] == 4: id_ = 28001 # bus
+        elif labels[i] == 5: id_ = 31001 # train
+        elif labels[i] == 6: id_ = 32001 # motorcycle
+        elif labels[i] == 7: id_ = 33001  # bicycle
+        else: id_ = 0
+
+        for j in range(len(seg_idx[0])):
+            label_id[seg_idx[0][j], seg_idx[1][j]] = id_
+        # print(len(np.where(label_id == labels[i])[0]), labels[i])
+        # label_id_list.append(label_id)
+    label_id = (label_id).astype(np.int32)
+    # print(" ")
+    # print("example")
+    # print(np.unique(pixel1), pixel1.dtype)
+    # print("real value")
+    # print(np.unique(label_id), label_id.dtype)
+    lab = Image.fromarray(label_id, 'I')
+    lab_name = out_file[:78] + '_gtFine_instanceIds.png'
+    lab.save(lab_name)
+    te2 = Image.open(out_file[:78] + '_gtFine_instanceIds.png')
+    pixel2 = np.array(te2)
+    # print("reopen value")
+    # print(np.unique(pixel2), pixel2.dtype)
+
+    # cv2.imwrite(oo, labels)
+
 
     img = mmcv.bgr2rgb(img)
     width, height = img.shape[1], img.shape[0]
